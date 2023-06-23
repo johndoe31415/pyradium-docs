@@ -11,10 +11,11 @@
 		<link rel="stylesheet" href="customfiles/template/antonio/font_latinmodernmono.css" />
 		<link rel="stylesheet" href="customfiles/template/base/pyradium_forms.css" />
 		<link rel="stylesheet" href="customfiles/template/base/pyradium_modal.css" />
+		<link rel="stylesheet" href="customfiles/template/base/pyradium_tooltip.css" />
 		<link rel="stylesheet" href="customfiles/template/base/pygments.css" />
+		<link rel="stylesheet" href="customfiles/template/base/pyradium_pause.css" />
 		<link rel="stylesheet" href="customfiles/template/base/pyradium_timer.css" />
 		<link rel="stylesheet" href="customfiles/template/base/pyradium_menu.css" />
-		<link rel="stylesheet" href="customfiles/template/base/pyradium_tooltip.css" />
 		<link rel="stylesheet" href="customfiles/template/base/pyradium_print.css" />
 	</head>
 
@@ -24,7 +25,7 @@
 				"format":		1,
 				"presentation":	{ },
 			};
-			globalThis.pyradium.presentation["info"] = {"renderer":"0.0.17rc0","source_versions":[{"filename":"examples/example.xml","version":{"git":"78b5a6379393c64cc14926d835feffcdebc05344","sha256":"4204293f5395537faa3a4e14b1222aae62fd8babc462584ac814698ac24b3858"}},{"filename":"examples/sub/example_sub.xml","version":{"git":"78b5a6379393c64cc14926d835feffcdebc05344","sha256":"76d4e4f887f27f15f318f069f85923f53a905d402a85d2b34b4807529902a6fc"}}]};
+			globalThis.pyradium.presentation["info"] = {"renderer":"0.0.17rc0","source_versions":[{"filename":"examples/example.xml","version":{"git":"da26eee71599a062c38f58e2150dda8e9adb86b2","sha256":"4204293f5395537faa3a4e14b1222aae62fd8babc462584ac814698ac24b3858"}},{"filename":"examples/sub/example_sub.xml","version":{"git":"da26eee71599a062c38f58e2150dda8e9adb86b2","sha256":"76d4e4f887f27f15f318f069f85923f53a905d402a85d2b34b4807529902a6fc"}}]};
 			globalThis.pyradium.presentation["interactive"] = {"presentation_time":"0:30","slide_ratios":[0.0147,0.0147,0.0147,0.0147,0.0147,0.0221,0.0333,0.0147,0.0147,0.0147,0.0147,0.0147,0.0083,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.3333,0.0147,0.0147,0.0147,0.0147,0.0147,0.0147,0.0,0.0,0.0]};
 		</script>
 
@@ -34,7 +35,8 @@
 			<input type="text" disabled="1" value="1" id="current_slideno" class="control" />
 			<button id="btn_goto_slide" class="control">Goto</button>
 			<button id="btn_timer" class="control">Timer</button>
-			<button id="btn_present" class="control">Start Presentation</button>
+			<button id="btn_pause" class="control">Pause</button>
+			<button id="btn_present" class="control">Start presentation</button>
 		</div>
 
 		<div class="belowmenu">
@@ -54,6 +56,27 @@
 					close_on_popup_click:	false,
 				});
 				document.querySelector("#info_git_revision").innerText = globalThis.pyradium.presentation.info.source_versions[0].filename + " / git " + globalThis.pyradium.presentation.info.source_versions[0].version.git;
+			</script>
+			<div class="modal type-info fixed" id="pyradium_pause_popup">
+				<div class="content">
+					<span class="close">×</span>
+					<div class="msg">
+						<div class="pause_duration">
+							Pause for <span id="pause_duration"></span> minutes until <span id="pause_until"></span>.
+						</div>
+						<div class="pause_remaining">
+							Remaining: <span id="pause_remaining"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<script type="module">
+				import {ModalWindow} from "./customfiles/template/base/pyradium_modal.js";
+				const modal_div = document.querySelector("#pyradium_pause_popup");
+				modal_div.pyradium_modal = new ModalWindow(modal_div, {
+					close_on_popup_click:	false,
+				});
 			</script>
 
 		<a class="slideanchor" name="slide1"></a>
@@ -2064,7 +2087,7 @@ Hello. <b>This is a test! tt</b> Fin.
 			
 
 		
-		<div class="fillimg"><img src="customfiles/imgs/img/204460bdeacf3e0ee3eb354513e988aa.png" class="fill"/></div>
+		<div class="fillimg"><img src="customfiles/imgs/img/6e309d9033f08ddd4627a92f69dae70d.png" class="fill"/></div>
 	
 
 		</div>
@@ -2104,7 +2127,7 @@ Hello. <b>This is a test! tt</b> Fin.
 			
 
 		
-		<div class="fillimg"><img src="customfiles/imgs/img/0dfcb4ae3b58b3a5978a3992efe1eed1.png" class="fill"/></div>
+		<div class="fillimg"><img src="customfiles/imgs/img/ecd5b80847f3fe94c16163dbc8f677d9.png" class="fill"/></div>
 	
 
 		</div>
@@ -2493,14 +2516,19 @@ Hello. <b>This is a test! tt</b> Fin.
 				"slideno_text":		document.querySelector("#current_slideno"),
 				"full_screen_div":	document.querySelector("#full_screen_div"),
 				"info_modal":		document.querySelector("#pyradium_info_popup"),
+				"pause_modal":		document.querySelector("#pyradium_pause_popup"),
 			};
-			const presentation = new Presentation(ui_elements, globalThis.pyradium.presentation.interactive);
+			const parameters = {
+				"preuri":			"customfiles/",
+			};
+			const presentation = new Presentation(ui_elements, parameters, globalThis.pyradium.presentation.interactive);
 			document.querySelector("#btn_goto_slide").addEventListener("click", (event) => presentation.goto_slide());
 			document.querySelector("#btn_present").addEventListener("click", (event) => presentation.start_presentation());
 			document.addEventListener("wheel", (event) => presentation.event_wheel(event));
 			document.addEventListener("fullscreenchange", (event) => presentation.event_fullscreen(event));
 			document.addEventListener("keypress", (event) => presentation.event_keypress(event));
 			document.addEventListener("keydown", (event) => presentation.event_keydown(event));
+			document.querySelector("#btn_pause").addEventListener("click", (event) => presentation.pause());
 			document.querySelector("#btn_timer").addEventListener("click", (event) => window.open("customfiles/template/base/timer.html#" + presentation.session_id));
 		</script>
 	</body>
